@@ -3,6 +3,7 @@
 //Updated 11/29/2020
 //Dr. G
 
+
 import javax.swing.JFrame;
 import java.awt.GridLayout;
 import javax.swing.JPanel;
@@ -31,6 +32,7 @@ public class GameDriver extends JFrame
 	private int counter = 0;
 	
 	private ArrayList<Bullet1> b1;
+	private ArrayList<MovingObject> m1;
 	private ArrayList<Tower> t1;
 	private int mouse_x;
 	private int mouse_y;
@@ -38,14 +40,18 @@ public class GameDriver extends JFrame
 	
 	//constructor
 	public GameDriver() {
-		
-		super("GAME");
-		
-		b1 = new ArrayList<Bullet1>();
+
+	    //Naming the JFrame
+		super("Tower Shooty Game");
+
+		//Reserving memory for the tower and the fireball
 		t1 = new ArrayList<Tower>();
-		
+		m1 = new ArrayList<MovingObject>();
+
+		//Setting up the JFrame Panels
 		getContentPane().setLayout(null);
-        
+
+		//This Panel contains the start button, money and lives counter.
         JPanel control = new JPanel();
         control.setBounds(0, 0, 125, 261);
         getContentPane().add(control);
@@ -58,68 +64,66 @@ public class GameDriver extends JFrame
         JLabel lbl_lives = new JLabel("Lives : ");
         lbl_lives.setBounds(10, 40, 99, 29);
         control.add(lbl_lives);
+
+        //setting the panel for the field, also when clicking on the field, reserves an x and y point for the tower
+        MyCanvas panel = new MyCanvas(4,4);
+        panel.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+
+                mouse_x = e.getX();
+                mouse_y = e.getY();
+
+            }
+        });
+        panel.setBounds(135, 0, 500, 500);
+        getContentPane().add(panel);
+        panel.setLayout(new GridLayout(1, 0, 0, 0));
         
         JButton btnStart = new JButton("START");
         btnStart.addMouseListener(new MouseAdapter() {
     
         	public void mouseClicked(MouseEvent e) {
+        	    //Increases the money counter
         		lbl_money.setText("Money : " + counter++ );
-                b1.add(new Bullet1(10,10,20,20));
+
+        		//Adds the tower to the field
                 try {
                 	
-                t1.add(new Tower(10, 10, ImageIO.read(new File("Crystal.png")), 20, 20));
+                t1.add(new Tower(mouse_x, mouse_y, ImageIO.read(new File("Crystal.png")), 20, 20));
           
                 } catch (IOException IOe) {
 					System.err.println("Unable to read the tower file: ");
 				}
+
         	}
         });
         btnStart.setBounds(10, 80, 89, 23);
         control.add(btnStart);
-        
-        MyCanvas panel = new MyCanvas(4,4);
-        panel.addMouseListener(new MouseAdapter() {
-        	public void mouseClicked(MouseEvent e) {
-        		
-        		mouse_x = e.getX();
-        		mouse_y = e.getY();
-        				
-        	}
-        });
-        panel.setBounds(135, 0, 299, 261);
-        getContentPane().add(panel);
-        panel.setLayout(new GridLayout(1, 0, 0, 0));
-        
-        for (int x = 0; x< 4; x++)
-			for (int y = 0; y < 4; y++)
+
+        //Sets the field image
+        for (int x = 0; x< 1; x++)
+			for (int y = 0; y < 1; y++)
 				((MyCanvas)panel).addPicture(x, y,"grass_02.png");
-        
-        Timer timer = new Timer(1000, new ActionListener() {
+
+        //Sets the timer when clicking the start button, draws a tower and sends it the fire command
+        Timer timer = new Timer(500, new ActionListener() {
             public void actionPerformed(ActionEvent evt) 
             {
+
                 panel.paint(panel.getGraphics());
-                
-             
-                if (!b1.isEmpty()) 
-                {
-                    for(Bullet1 tempBullet : b1)
-                    {    
-                        tempBullet.drawImage(panel.getGraphics());
-                        
-                    }
-                }
                 
                 if (!t1.isEmpty()) 
                 {
                     for(Tower tempTower : t1)
-                    {    
+                    {
                         tempTower.drawImage(panel.getGraphics());
-                        
+                        tempTower.fire(panel.getGraphics());
                     }
                 }
-                
+
             }});
-        
+
+        //Starts timer
         timer.start();
 		
 	}
@@ -128,60 +132,9 @@ public class GameDriver extends JFrame
 	
 	public static void main(String[] args) {
 		
-		
-		//1. Try to open the file with WindowsBuilder
-		//If you need to install it go to Help -> Market place and do a search
-		//For windows builder to work the file has to be a JFrame
-		//2. Uncomment and discuss the code at the bottom of this file
-		//3. Explore the different layouts within WB and then add a layout and observe what happens to your code
-		//4. Create two panels one for controls and one for the map then explore different layouts
-		//5. Add labels for lives and money to the control panel
-		//6. Add a start button to the control panel
-		//7. Construct an object to test your results so far
-		//8. Notice how you can adjust things in the code or with the GUI
-		//9. Make the program print something when you click the start button
-		//10. Create an output label and change the text there when there's a mouse click
-		//11. Add the MyCanvas file to the project and review
-		//12. Make MyCanvas your 2nd JPanel and add this code in the appropriate place
-		
-		
-		 
-		 
-		
-		//You can control the size and bounds as well if desired
-		//It used to be a JFrame it's now a what? Why?
-		
-		//13. Change the tile to one you download
-		
-		//14. Discuss the paint method in MyCanvas
-		//15. Add the bullet file to the project and review
-		
-		//16. Add a timer object and listener
-		
-		/*
-		Timer timer = new Timer(1000, new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				
-				//do stuff
-				
-			}});
-		 */
-		
-		//17. Create a bullet object and have it drawn in the timer listener
-		
-		//18. Start the timer when the user hits the previously created button
-		//19. Add MapObject, Tower, and MovingObject then review
-		//20. Have the bullet fire from a tower
-		/*
-		For your lab
-		1. organize and comment this code file
-		2. have the tower fire a fire ball instead of a black circle
-		More details will be given in class lecture
-		*/
-		
-		
+		//Setting the driver and the size of the JFrame window
 		GameDriver m = new GameDriver();
-		m.setSize(600, 600);
+		m.setSize(1000, 1000);
 		m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		m.setVisible(true);
 		
